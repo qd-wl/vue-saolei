@@ -3,7 +3,7 @@
 用Vue制作的一个扫雷游戏。
 
 在线体验：
-
+https://qd-wl.github.io/vue-saolei/
 
 代码目录：project
 
