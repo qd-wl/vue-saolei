@@ -13,5 +13,5 @@ module.exports = {
 			}))
 	},
 
-	publicPath: '/vue_saolei'
+	publicPath: '/vue-saolei'
 }
