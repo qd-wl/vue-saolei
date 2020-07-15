@@ -2,16 +2,18 @@
 	<div class="map">
 		<div class="level-desc">{{getLevelDesc}}</div>
 		<div class="text-desc" :style="getPlayDescStyle">{{getPlayDesc}}</div>
-		<div class="row" v-for="(row, rowIndex) in mRowList" :key="rowIndex">
-			<div class="cell" :style="mStyle" v-for="(row, columnIndex) in mColumnList" :key="columnIndex">
-				<div class="cell-content" @click="onClickBlock(rowIndex, columnIndex)" @contextmenu.prevent="onRightClickBlock(rowIndex, columnIndex)">
-					<div class="float-block" v-if="!isBlockOpen(rowIndex, columnIndex)">
-						<div class="red-flag-s" v-if="isBlockFlag(rowIndex, columnIndex)"></div>
+		<div class="main-map">
+			<div class="row" v-for="(row, rowIndex) in mRowList" :key="rowIndex">
+				<div class="cell" :style="mStyle" v-for="(row, columnIndex) in mColumnList" :key="columnIndex">
+					<div class="cell-content" @click="onClickBlock(rowIndex, columnIndex)" @contextmenu.prevent="onRightClickBlock(rowIndex, columnIndex)">
+						<div class="float-block" v-if="!isBlockOpen(rowIndex, columnIndex)">
+							<div class="red-flag-s" v-if="isBlockFlag(rowIndex, columnIndex)"></div>
+						</div>
+						<span class="text-num" :style="getBombNumberStyle(rowIndex, columnIndex)" v-if="isBlockOpen(rowIndex, columnIndex) && getBlockInfo(rowIndex, columnIndex) > 0">
+							{{getBlockInfo(rowIndex, columnIndex)}}
+						</span>
+						<div class="bomb" v-if="isBlockOpen(rowIndex, columnIndex) && isBomb(rowIndex, columnIndex)"></div>
 					</div>
-					<span class="text-num" :style="getBombNumberStyle(rowIndex, columnIndex)" v-if="isBlockOpen(rowIndex, columnIndex) && getBlockInfo(rowIndex, columnIndex) > 0">
-						{{getBlockInfo(rowIndex, columnIndex)}}
-					</span>
-					<div class="bomb" v-if="isBlockOpen(rowIndex, columnIndex) && isBomb(rowIndex, columnIndex)"></div>
 				</div>
 			</div>
 		</div>
@@ -199,13 +201,16 @@
 					var rightColumn = curColumn + 1; // 右列
 
 					var call = function(tempRow, tempColumn) {
-						var top = this.getBlockInfo(tempRow, tempColumn);
-						if (top == 0) {
+						if (this.isBlockFlag(tempRow, tempColumn)) {
+							return;
+						}
+						var blockInfo = this.getBlockInfo(tempRow, tempColumn);
+						if (blockInfo == 0) {
 							if (!this.isBlockOpen(tempRow, tempColumn)) {
 								this.openBlock(tempRow, tempColumn);
 								return open(tempRow, tempColumn);
 							}
-						} else if (top > 0) {
+						} else if (blockInfo > 0) {
 							this.openBlock(tempRow, tempColumn);
 						}
 					}.bind(this)
@@ -284,7 +289,7 @@
 				var result = this.Data.getRowAndColumn(this.mCurLevel);
 				this.mRow = result[0];
 				this.mColumn = result[1];
-				var num = 96 / this.mRow;
+				var num = 96 / this.mColumn;
 				this.mStyle = `width:${num}vw;height:${num}vw`;
 				this.mRowList = [];
 				for (var i = 0; i < this.mRow; i++) {
@@ -378,7 +383,7 @@
 	.level-desc {
 		margin-bottom: 10px;
 		color: #0000ff;
-		font-size: 30px;
+		font-size: 24px;
 	}
 
 	.text-desc {
@@ -412,17 +417,20 @@
 		justify-content: center;
 	}
 
+	.main-map {
+		padding-top: 1px;
+		padding-left: 1px;
+		background: rgb(128, 128, 128);
+	}
+
 	.row {
 		display: flex;
 	}
 
 	.cell {
 		display: flex;
-		align-items: center;
-		justify-content: center;
 		max-width: 60px;
 		max-height: 60px;
-		background: rgb(128, 128, 128);
 		cursor: default;
 	}
 
@@ -528,7 +536,7 @@
 		border-width: 8px;
 		border-style: solid;
 		border-color: transparent rgb(236, 51, 35) transparent transparent;
-		margin-top: -10px;
+		margin-top: -12px;
 		margin-left: -10px;
 	}
 
@@ -562,9 +570,9 @@
 	}
 
 	.bomb-desc {
-		font-size: 24px;
+		font-size: 20px;
 		margin-left: 10px;
-		background-image: -webkit-linear-gradient(360deg, green, red);
+		background-image: -webkit-linear-gradient(360deg, green, brown);
 		-webkit-background-clip: text;
 		-webkit-text-fill-color: transparent;
 	}
